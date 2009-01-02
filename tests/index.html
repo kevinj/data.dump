@@ -1,0 +1,13 @@
+<html>
+<head>
+  <script type="text/javascript" src="./lib/JSAN.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+new JSAN("./lib").use("Test.Harness.Browser");
+new Test.Harness.Browser('./lib/JSAN.js').runTests(
+  'dump.html'
+);
+</script>
+</body>
+</html>

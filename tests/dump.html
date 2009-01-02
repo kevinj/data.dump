@@ -1,0 +1,122 @@
+
+<html>
+  <head>
+    <style>
+      .t { display: none }
+    </style>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="./lib/JSAN.js"></script>
+    <script type="text/javascript" src="../lib/Data/Dump.js"></script>
+  </head>
+  <body>
+
+    <!-- Simple structures: -->
+    <pre class="t" name="string">"hi"</pre>
+    <pre class="t" name="hash">{ key_a: "value1", key_b: "value2" }</pre>
+    <pre class="t" name="array">[ "one", "two", "three", "four" ]</pre>
+    <pre class="t" name="utf8 string">unescape('%u8868')</pre>
+    <pre class="t" name="date">new Date("Mon, 26 Feb 2007 08:01:39 UTC")</pre>
+
+    <!-- Long simple structures: -->
+    <pre class="t" name="long hash">{
+    long_key_a____________________________________: "long_val__________________________________",
+    long_key_b____________________________________: "long_val__________________________________"
+}</pre>
+
+    <pre class="t" name="long array">[
+    "long_string__________________________________",
+    "long_string__________________________________"
+]</pre>
+
+    <!-- Complex structures -->
+    <pre class="t" name="hash of arrays">{
+    numbers: [ "one", "two", "three", "four", "five" ],
+    letters: [ "a", "b", "c", "d", "e", "f" ]
+}</pre>
+
+    <pre class="t" name="array of hashes">[
+    { key: "val" },
+    { key: "val" },
+    { key: "val" },
+    { key: "val" },
+    { key: "val" },
+    { key: "val" }
+]</pre>
+
+    <pre class="t" name="mixed 1">{
+    short_array: [ "short", "array" ],
+    long_array: [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    ],
+    short_hash: { key: "val" },
+    long_hash: {
+        a: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        b: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+}</pre>
+
+    <pre class="t" name="mixed 2">{
+    array_of_arrays: [ [ "a", "b", "c" ], [ 1, 2, 3, 4 ] ],
+    hash_of_hash: { one: { key: "val" }, two: { key: "val" } },
+    long_array: [
+        [
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        ],
+        [
+            "ccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "ddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        ]
+    ],
+    long_hash: {
+        aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: {
+            aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: { key: "val" }
+        }
+    }
+}</pre>
+
+    <pre><script type="text/javascript">
+      new JSAN('./lib').use('Test.More');
+      new JSAN('../lib').use('Data.Dump');
+
+      var test = Test.Builder.instance();
+
+      var pre_blocks = document.getElementsByTagName('pre');
+      var test_cases = [];
+      for (var i=0; i<pre_blocks.length; i++) {
+        if (pre_blocks[i].className == 't') {
+          test_cases.push(pre_blocks[i]);
+        }
+      }
+
+      test.plan({tests: 3 + test_cases.length});
+
+      var Data; //dont die if it's undefined
+      if (typeof(Data) == 'undefined') {
+	test.die("Data.Dump wasn't loaded");
+      }
+
+      // Make sure everything exists
+      ok(Data, "Data is defined");
+
+      ok(Data.Dump, "Data.Dump is defined");
+      ok(Dump, "dump is defined");
+
+      for (var i=0; i<test_cases.length; i++) {
+        var name = test_cases[i].getAttribute('name');
+
+	// Eval the content of the <pre> so we can dump it
+        var code = test_cases[i].innerText || test_cases[i].textContent;
+        var evaled;
+        eval("evaled = " + code);
+
+	// Remove carriage returns (for Internet Explorer)
+	code = code.replace(/\r/g, '');
+
+        is( Dump(evaled), code, name );
+      }
+
+    </script></pre>
+  </body>
+</html>
